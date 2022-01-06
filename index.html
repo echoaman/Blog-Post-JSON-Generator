@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="style.css">
+	<script src="./script.js" defer></script>
+	<title>Blog Post JSON Generator</title>
+</head>
+
+<body>
+	<button class="create-json-btn" onclick="createJson()">Copy Blog Post JSON</button>
+	<button class="create-post-content-btn" onclick="createPostContentRow()">Create Post Content Row</button>
+	<div class="container" id="container">
+		<div class="container-row" id="heading-row">
+			<label for="heading">Heading</label>
+			<textarea name="heading" id="heading" cols="50" rows="3"></textarea>
+		</div>
+		<div class="container-row" id="desc-row">
+			<label for="desc">Description</label>
+			<textarea name="desc" id="desc" cols="50" rows="7" maxlength="200"></textarea>
+		</div>
+		<div class="container-row" id="date-row">
+			<label for="date">Published Date</label>
+			<input type="text" name="date" id="date" placeholder="15th January, 2022">
+		</div>
+		<div class="container-row" id="dateTime-row">
+			<label for="dateTime">Datetime</label>
+			<input type="text" name="dateTime" id="dateTime" placeholder="2022-01-15">
+		</div>
+	</div>
+</body>
+
+</html>

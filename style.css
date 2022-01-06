@@ -1,0 +1,67 @@
+*, *::after, *::before {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	width: 100vw;
+	min-height: 100vh;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: hsl(0, 0%, 10%);
+	padding-top: 50px;
+	overflow-x: hidden;
+}
+
+.create-json-btn {
+	position: fixed;
+	top: 10px;
+	left: 20px;
+	background-color: green;
+}
+
+.create-post-content-btn {
+	position: fixed;
+	top: 10px;
+	left: 50%;
+	background-color: aqua;
+}
+
+label {
+	color: white;
+}
+
+.container {
+	display: flex;
+	flex-direction: column;
+	row-gap: 10px;
+	width: 75vw;
+}
+
+.container-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	place-items: center;
+	column-gap: 20px;
+	padding: 10px;
+}
+
+button {
+	padding: 5px;
+	border: none;
+	cursor: pointer;
+}
+
+.delete-btn {
+	background-color: red;
+}
+
+button:hover {
+	font-weight: bold;
+}
+
+button:active {
+	transform: scale(1.1);
+}

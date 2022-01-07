@@ -20,15 +20,8 @@
 		</div>
 		<div class="container-row" id="desc-row">
 			<label for="desc">Description</label>
-			<textarea name="desc" id="desc" cols="50" rows="7" maxlength="200"></textarea>
-		</div>
-		<div class="container-row" id="date-row">
-			<label for="date">Published Date</label>
-			<input type="text" name="date" id="date" placeholder="15th January, 2022">
-		</div>
-		<div class="container-row" id="dateTime-row">
-			<label for="dateTime">Datetime</label>
-			<input type="text" name="dateTime" id="dateTime" placeholder="2022-01-15">
+			<textarea name="desc" id="desc" cols="50" rows="7" maxlength="200" oninput="updateCharCount()"></textarea>
+			<p><span id="desc-count">0</span> / 200</p>
 		</div>
 	</div>
 </body>

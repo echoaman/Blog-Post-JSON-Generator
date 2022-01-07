@@ -2,6 +2,7 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+	font-family: sans-serif;
 }
 
 body {
@@ -25,11 +26,11 @@ body {
 .create-post-content-btn {
 	position: fixed;
 	top: 10px;
-	left: 50%;
+	right: 20px;
 	background-color: aqua;
 }
 
-label {
+label, p {
 	color: white;
 }
 
@@ -58,10 +59,14 @@ button {
 	background-color: red;
 }
 
+.delete-btn:active, .create-json-btn:active, .create-post-content-btn:active {
+	transform: scale(1.1);
+}
+
 button:hover {
 	font-weight: bold;
 }
 
-button:active {
-	transform: scale(1.1);
+select {
+	padding: 5px;
 }

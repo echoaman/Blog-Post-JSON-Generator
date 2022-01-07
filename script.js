@@ -1,11 +1,10 @@
-document.onkeydown = keydown;
+document.onkeydown = shortCuts;
+const desc = document.getElementById("desc");
+const heading = document.getElementById("heading");
+const descCount = document.getElementById("desc-count");
 
 function createJson() {
 	try {
-		const heading = document.getElementById("heading");
-		const desc = document.getElementById("desc");
-		const date = document.getElementById("date");
-		const dateTime = document.getElementById("dateTime");
 		const jsonData = {};
 	
 		// basic meta
@@ -13,14 +12,59 @@ function createJson() {
 		jsonData["desc"] = desc.value;
 	
 		// publish date
+		const today = new Date();
+		const date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+		const formattedDate = today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
 		const publishData = {};
-		publishData["date"] = date.value;
-		publishData["dateTime"] = dateTime.value;
+		publishData["dateTime"] = date;
+		publishData["date"] = formattedDate;
 	
 		jsonData["publishedOn"] = publishData;
 
 		// blog post content
 		jsonData["postContent"] = [];
+
+		const postContentRows = document.querySelectorAll(".post-content-row");
+		let rowData = null;
+		let listDataArray = null;
+		let listTag = null;
+
+		for (let index = 0; index < postContentRows.length; index++) {
+			const tag = postContentRows[index].children[0].value;
+			const tagValue = postContentRows[index].children[1].value;
+			if(tag !== "ul") {
+				if(listDataArray) {
+					// if ul data is present, push it
+					const listData = {};
+					listData[listTag] = listDataArray;
+					jsonData["postContent"].push(listData);
+
+					// reset
+					listDataArray = null;
+				}
+				rowData = {};
+				rowData[tag] = tagValue;
+				jsonData["postContent"].push(rowData);
+			} else {
+				if(!listDataArray) {
+					// create new list data array
+					listDataArray = [tagValue];
+					listTag = tag;
+				} else {
+					listDataArray.push(tagValue);
+				}
+			}
+		}
+
+		if(listDataArray) {
+			// if ul data is present, push it
+			const listData = {};
+			listData[listTag] = listDataArray;
+			jsonData["postContent"].push(listData);
+
+			// reset
+			listDataArray = null;
+		}
 	
 		navigator.clipboard.writeText(JSON.stringify(jsonData));
 		alert("Blog Post JSON copied to clipboard");
@@ -66,9 +110,11 @@ function createPostContentRow() {
 	row.appendChild(deleteBtn);
 
 	container.appendChild(row);
+
+	row.scrollIntoView({behavior: "smooth"});
 }
 
-function keydown(evt){
+function shortCuts(evt){
 	// Control + Alt + k => Create hypertext
 	if (evt.ctrlKey && evt.altKey && evt.keyCode === 75){
 		navigator.clipboard.writeText(`<strong><a title='text' href='href' target='_blank' rel='noopener noreferrer'>text</a></strong>`);
@@ -77,4 +123,8 @@ function keydown(evt){
 	if (evt.ctrlKey && evt.altKey && evt.keyCode === 66){
 		navigator.clipboard.writeText(`<strong>text</strong>`);
 	}
+}
+
+function updateCharCount() {
+	descCount.textContent = desc.value.length;
 }

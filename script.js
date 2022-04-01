@@ -2,6 +2,10 @@ document.onkeydown = shortCuts;
 const desc = document.getElementById("desc");
 const heading = document.getElementById("heading");
 const descCount = document.getElementById("desc-count");
+const prevBlogUrl = document.getElementById("prev-blog-url");
+const prevBlogTitle = document.getElementById("prev-blog-title");
+const nextBlogUrl = document.getElementById("next-blog-url");
+const nextBlogTitle = document.getElementById("next-blog-title");
 
 function createJson() {
 	try {
@@ -20,6 +24,22 @@ function createJson() {
 		publishData["date"] = formattedDate;
 	
 		jsonData["publishedOn"] = publishData;
+
+		// Next blog
+		if(nextBlogUrl.value && nextBlogTitle.value) {
+			const nextBlog = {};
+			nextBlog["url"] = nextBlogUrl.value;
+			nextBlog["title"] = nextBlogTitle.value;
+			jsonData["nextBlog"] = nextBlog;
+		}
+
+		// Prev blog
+		if(prevBlogUrl.value && prevBlogTitle.value) {
+			const prevBlog = {};
+			prevBlog["url"] = prevBlogUrl.value;
+			prevBlog["title"] = prevBlogTitle.value;
+			jsonData["prevBlog"] = prevBlog;
+		}
 
 		// blog post content
 		jsonData["postContent"] = [];
@@ -74,7 +94,7 @@ function createJson() {
 }
 
 function createPostContentRow() {
-	const optionsList = ["p", "ul", "h2", "h3"];
+	const optionsList = ["p", "ul", "h2", "h3", "codeblokc"];
 	const container = document.getElementById("container");
 
 	// row element

@@ -70,3 +70,7 @@ button:hover {
 select {
 	padding: 5px;
 }
+
+input:focus-visible, textarea:focus-visible {
+	outline: none;
+}

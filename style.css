@@ -1,4 +1,6 @@
-*, *::after, *::before {
+*,
+*::after,
+*::before {
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
@@ -23,14 +25,28 @@ body {
 	background-color: green;
 }
 
-.create-post-content-btn {
+.insert-row-btn {
 	position: fixed;
-	top: 10px;
+	bottom: 10px;
 	right: 20px;
 	background-color: aqua;
 }
 
-label, p {
+.read-json-btn {
+	position: fixed;
+	top: 10px;
+	right: 20px;
+	background-color: yellow;
+}
+
+.read-json-input {
+	position: fixed;
+	right: 0;
+	top: 50px;
+}
+
+label,
+p {
 	color: white;
 }
 
@@ -49,6 +65,7 @@ label, p {
 	padding: 10px;
 }
 
+
 button {
 	padding: 5px;
 	border: none;
@@ -59,11 +76,8 @@ button {
 	background-color: red;
 }
 
-.delete-btn:active, .create-json-btn:active, .create-post-content-btn:active {
+.enlarge-btn:hover {
 	transform: scale(1.1);
-}
-
-button:hover {
 	font-weight: bold;
 }
 
@@ -71,6 +85,7 @@ select {
 	padding: 5px;
 }
 
-input:focus-visible, textarea:focus-visible {
+input:focus-visible,
+textarea:focus-visible {
 	outline: none;
 }

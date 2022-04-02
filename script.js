@@ -6,6 +6,7 @@ const prevBlogUrl = document.getElementById("prev-blog-url");
 const prevBlogTitle = document.getElementById("prev-blog-title");
 const nextBlogUrl = document.getElementById("next-blog-url");
 const nextBlogTitle = document.getElementById("next-blog-title");
+const readJsonInput = document.getElementById("read-json-input");
 
 function createJson() {
 	try {
@@ -93,8 +94,8 @@ function createJson() {
 	}
 }
 
-function createPostContentRow() {
-	const optionsList = ["p", "ul", "h2", "h3", "codeblokc"];
+function createPostContentRow(preSelectOption = "p", text = "") {
+	const optionsList = ["p", "ul", "h2", "h3", "codeblock"];
 	const container = document.getElementById("container");
 
 	// row element
@@ -108,7 +109,7 @@ function createPostContentRow() {
 		const option = document.createElement("option");
 		option.value = item;
 		option.text = item;
-		option.selected = item === "p";
+		option.selected = item === preSelectOption;
 		dropdown.appendChild(option);
 	});
 
@@ -116,11 +117,13 @@ function createPostContentRow() {
 	const textArea = document.createElement("textarea");
 	textArea.cols = 50;
 	textArea.rows = 7
+	textArea.value = text;
 
 	// delete row button
 	const deleteBtn = document.createElement("button");
 	deleteBtn.textContent = "Delete Row";
 	deleteBtn.classList.add("delete-btn");
+	deleteBtn.classList.add("enlarge-btn");
 	deleteBtn.addEventListener("click", () => {
 		row.remove();
 	});
@@ -147,4 +150,49 @@ function shortCuts(evt){
 
 function updateCharCount() {
 	descCount.textContent = desc.value.length;
+}
+
+function readJson() {
+	const data = JSON.parse(readJsonInput.value);
+	
+	// read heading data
+	const headingData = data["heading"];
+	heading.value = headingData;
+
+	// read description data
+	const descData = data["desc"];
+	desc.value = descData;
+	descCount.textContent = descData.length;
+
+	// log date data;
+	const publishedOnData = data["publishedOn"];
+	console.log(publishedOnData);
+
+	// read prev blog data
+	const prevBlogData = data["prevBlog"];
+	if(prevBlogData) {
+		prevBlogUrl.value = prevBlogData["url"];
+		prevBlogTitle.value = prevBlogData["title"];
+	}
+	
+	// read next blog data
+	const nextBlogData = data["nextBlog"];
+	if(nextBlogData) {
+		nextBlogUrl.value = nextBlogData["url"];
+		nextBlogTitle.value = nextBlogData["title"];
+	}
+
+	const postContentData = data["postContent"];
+	for(let i = 0 ; i < postContentData.length ; i++) {
+		for(let key in postContentData[i]) {
+			if(key === "ul") {
+				const ulData = postContentData[i][key];
+				for(let j = 0 ; j < ulData.length ; j++) {
+					createPostContentRow(key, ulData[j]);
+				}
+			} else {
+				createPostContentRow(key, postContentData[i][key]);
+			}
+		}
+	}
 }

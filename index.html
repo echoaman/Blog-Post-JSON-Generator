@@ -11,8 +11,10 @@
 </head>
 
 <body>
-	<button class="create-json-btn" onclick="createJson()">Copy Blog Post JSON</button>
-	<button class="create-post-content-btn" onclick="createPostContentRow()">Create Post Content Row</button>
+	<button class="create-json-btn enlarge-btn" onclick="createJson()">Copy Blog Post JSON</button>
+	<button class="insert-row-btn enlarge-btn" onclick="createPostContentRow()">Insert Row</button>
+	<button class="read-json-btn enlarge-btn" onclick="readJson()">Read JSON</button>
+	<textarea class="read-json-input" id="read-json-input"></textarea>
 	<div class="container" id="container">
 		<div class="container-row" id="heading-row">
 			<label for="heading">Heading</label>
@@ -20,7 +22,8 @@
 		</div>
 		<div class="container-row" id="desc-row">
 			<label for="desc">Description</label>
-			<textarea name="desc" id="desc" cols="50" rows="7" maxlength="200" oninput="updateCharCount()" placeholder="Description"></textarea>
+			<textarea name="desc" id="desc" cols="50" rows="7" maxlength="200" oninput="updateCharCount()"
+				placeholder="Description"></textarea>
 			<p><span id="desc-count">0</span> / 200</p>
 		</div>
 		<div class="container-row" id="prev-blog-url-row">

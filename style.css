@@ -71,6 +71,11 @@ button {
 	cursor: pointer;
     display: flex;
     align-items: center;
+    column-gap: 5px;
+}
+
+textarea, input {
+    padding: 5px;
 }
 
 .blog-content-row {

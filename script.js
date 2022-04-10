@@ -1,203 +1,127 @@
-document.onkeydown = shortCuts;
-const desc = document.getElementById("desc");
 const heading = document.getElementById("heading");
-const descCount = document.getElementById("desc-count");
-const prevBlogUrl = document.getElementById("prev-blog-url");
+const description = document.getElementById("description");
+const keywords = document.getElementById("keywords");
+const date = document.getElementById("date");
+const dateTime = document.getElementById("date-time");
 const prevBlogTitle = document.getElementById("prev-blog-title");
-const nextBlogUrl = document.getElementById("next-blog-url");
+const prevBlogSlug = document.getElementById("prev-blog-slug");
 const nextBlogTitle = document.getElementById("next-blog-title");
-const readJsonInput = document.getElementById("read-json-input");
+const nextBlogSlug = document.getElementById("next-blog-slug");
+const jsonInput = document.getElementById("json-input");
+const blogContentContainer = document.querySelector(".blog-content");
 
-function createJson() {
-    try {
-        const jsonData = {};
-    
-        // basic meta
-        jsonData["heading"] = heading.value;
-        jsonData["desc"] = desc.value;
-    
-        // publish date
+function generateJson() {
+    const blogJson = {};
+    blogJson["heading"] = heading.value;
+    blogJson["desc"] = description.value;
+    blogJson["keywords"] = keywords.value;
+
+    // publish date
+    const publishDate = {};
+    if(!date.value || !dateTime.value) {
         const today = new Date();
-        const date = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+        const todayDateTime = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
         const formattedDate = today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-        const publishData = {};
-        publishData["dateTime"] = date;
-        publishData["date"] = formattedDate;
-    
-        jsonData["publishedOn"] = publishData;
-
-        // Next blog
-        if(nextBlogUrl.value && nextBlogTitle.value) {
-            const nextBlog = {};
-            nextBlog["url"] = nextBlogUrl.value;
-            nextBlog["title"] = nextBlogTitle.value;
-            jsonData["nextBlog"] = nextBlog;
-        }
-
-        // Prev blog
-        if(prevBlogUrl.value && prevBlogTitle.value) {
-            const prevBlog = {};
-            prevBlog["url"] = prevBlogUrl.value;
-            prevBlog["title"] = prevBlogTitle.value;
-            jsonData["prevBlog"] = prevBlog;
-        }
-
-        // blog post content
-        jsonData["postContent"] = [];
-
-        const postContentRows = document.querySelectorAll(".post-content-row");
-        let rowData = null;
-        let listDataArray = null;
-        let listTag = null;
-
-        for (let index = 0; index < postContentRows.length; index++) {
-            const tag = postContentRows[index].children[0].value;
-            const tagValue = postContentRows[index].children[1].value;
-            if(tag !== "ul") {
-                if(listDataArray) {
-                    // if ul data is present, push it
-                    const listData = {};
-                    listData[listTag] = listDataArray;
-                    jsonData["postContent"].push(listData);
-
-                    // reset
-                    listDataArray = null;
-                }
-                rowData = {};
-                rowData[tag] = tagValue;
-                jsonData["postContent"].push(rowData);
-            } else {
-                if(!listDataArray) {
-                    // create new list data array
-                    listDataArray = [tagValue];
-                    listTag = tag;
-                } else {
-                    listDataArray.push(tagValue);
-                }
-            }
-        }
-
-        if(listDataArray) {
-            // if ul data is present, push it
-            const listData = {};
-            listData[listTag] = listDataArray;
-            jsonData["postContent"].push(listData);
-
-            // reset
-            listDataArray = null;
-        }
-    
-        navigator.clipboard.writeText(JSON.stringify(jsonData));
-        alert("Blog Post JSON copied to clipboard");
-    } catch (error) {
-        alert("Some error occured");
+        publishDate["date"] = formattedDate;
+        publishDate["datetime"] = todayDateTime;
+    } else {
+        publishDate["date"] = date.value;
+        publishDate["dateTime"] = dateTime.value;
     }
+    blogJson["publishedOn"] = publishDate;
+
+    // Prev blog data
+    if(prevBlogTitle.value && prevBlogSlug.value) {
+        const prevBlog = {};
+        prevBlog["slug"] = prevBlogSlug.value;
+        prevBlog["title"] = prevBlogTitle.value;
+        blogJson["prevBlog"] = prevBlog;
+    }
+
+    // Next blog data
+    if(nextBlogSlug.value && nextBlogTitle.value) {
+        const nextBlog = {};
+        nextBlog["slug"] = nextBlogSlug.value;
+        nextBlog["title"] = nextBlogTitle.value;
+        blogJson["nextBlog"] = nextBlog;
+    }
+
+    console.log(blogJson);
+    navigator.clipboard.writeText(JSON.stringify(blogJson));
+    alert("Blog post JSON copied");
 }
 
-function createPostContentRow(preSelectOption = "p", text = "") {
-    const optionsList = ["p", "ul", "h2", "h3", "codeblock"];
-    const container = document.getElementById("container");
+function addContentRow() {
+	const row = document.createElement("div");
+	row.classList.add("blog-content-row");
 
-    // row element
-    const row = document.createElement("div");
-    row.classList.add("container-row");
-    row.classList.add("post-content-row");
+	// tags
+	const select = document.createElement("select");
+	const options = ["p", "h2", "h3", "ul", "codeblock"];
+	options.forEach(opt => {
+		const option = document.createElement("option");
+		option.value = opt;
+		option.textContent = opt;
+		option.selected = opt === "p";
+		select.append(option);
+	});
 
-    // select element
-    const dropdown = document.createElement("select");
-    optionsList.forEach(item => {
-        const option = document.createElement("option");
-        option.value = item;
-        option.text = item;
-        option.selected = item === preSelectOption;
-        dropdown.appendChild(option);
+	row.appendChild(select);
+
+	// input
+	const input = document.createElement("textarea");
+	input.rows = 5;
+	row.appendChild(input);
+
+	// delete btn
+	const deleteBtn = document.createElement("button");
+	deleteBtn.textContent = "Delete";
+	deleteBtn.classList.add("bkg-red");
+	deleteBtn.addEventListener("click", function() {
+		row.remove();
+	});
+	row.appendChild(deleteBtn);
+
+    // up button
+    const upBtn = document.createElement("button");
+    upBtn.innerHTML = 'Up <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="fill: white;"><path d="M11 8.414V18h2V8.414l4.293 4.293 1.414-1.414L12 4.586l-6.707 6.707 1.414 1.414z"></path></svg>';
+    upBtn.classList.add("up-btn");
+    upBtn.classList.add("bkg-orange");
+    upBtn.addEventListener("click", function() {
+        row.parentElement.insertBefore(row, row.previousElementSibling);
     });
-
-    // text element
-    const textArea = document.createElement("textarea");
-    textArea.cols = 50;
-    textArea.rows = 7
-    textArea.value = text;
-
-    // delete row button
-    const deleteBtn = document.createElement("button");
-    deleteBtn.textContent = "Delete Row";
-    deleteBtn.classList.add("delete-btn");
-    deleteBtn.classList.add("enlarge-btn");
-    deleteBtn.addEventListener("click", () => {
-        row.remove();
+    row.appendChild(upBtn);
+    
+    // down button
+    const downBtn = document.createElement("button");
+    downBtn.innerHTML = 'Down <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="fill: white;"><path d="m18.707 12.707-1.414-1.414L13 15.586V6h-2v9.586l-4.293-4.293-1.414 1.414L12 19.414z"></path></svg>';
+    downBtn.classList.add("down-btn");
+    downBtn.classList.add("bkg-orange");
+    downBtn.addEventListener("click", function() {
+        row.parentElement.insertBefore(row.nextElementSibling, row);
     });
+    row.appendChild(downBtn);
+
+	blogContentContainer.appendChild(row);
+
+	row.scrollIntoView({ behavior: "smooth" });
+}
+
+function readBlogJson() {
+    const blogJson = JSON.parse(jsonInput.value);
+    heading.value = blogJson["heading"];
+    description.value = blogJson["desc"];
+    keywords.value = blogJson["keywords"];
+    date.value = blogJson["publishedOn"].date;
+    dateTime.value = blogJson["publishedOn"].dateTime;
     
-    row.appendChild(dropdown);
-    row.appendChild(textArea);
-    row.appendChild(deleteBtn);
-
-    container.appendChild(row);
-
-    row.scrollIntoView({behavior: "smooth"});
-}
-
-function shortCuts(evt){
-    // Control + Alt + k => Create hypertext
-    if (evt.ctrlKey && evt.altKey && evt.keyCode === 75){
-        navigator.clipboard.writeText(`<strong><a title='text' href='href' target='_blank' rel='noopener noreferrer'>text</a></strong>`);
-    }
-    // Control + Alt + b => Create bold text
-    if (evt.ctrlKey && evt.altKey && evt.keyCode === 66){
-        navigator.clipboard.writeText(`<strong>text</strong>`);
-    }
-}
-
-function updateCharCount() {
-    descCount.textContent = desc.value.length;
-}
-
-function readJson() {
-	const jsonString = readJsonInput.value;
-	if(!jsonString) {
-		return;
-	}
-
-    const data = JSON.parse(jsonString);
-
-    // read heading data
-    const headingData = data["heading"];
-    heading.value = headingData;
-
-    // read description data
-    const descData = data["desc"];
-    desc.value = descData;
-    descCount.textContent = descData.length;
-
-    // log date data;
-    const publishedOnData = data["publishedOn"];
-    console.log(publishedOnData);
-
-    // read prev blog data
-    const prevBlogData = data["prevBlog"];
-    if(prevBlogData) {
-        prevBlogUrl.value = prevBlogData["url"];
-        prevBlogTitle.value = prevBlogData["title"];
-    }
-    
-    // read next blog data
-    const nextBlogData = data["nextBlog"];
-    if(nextBlogData) {
-        nextBlogUrl.value = nextBlogData["url"];
-        nextBlogTitle.value = nextBlogData["title"];
+    if(blogJson["prevBlog"]) {
+        prevBlogSlug.value = blogJson["prevBlog"].slug;
+        prevBlogTitle.value = blogJson["prevBlog"].title;
     }
 
-    const postContentData = data["postContent"];
-    for(let row = 0 ; row < postContentData.length ; row++) {
-        for(let tag in postContentData[row]) {
-            if(tag === "ul") {
-                const listItems = postContentData[row][tag];
-                for(let j = 0 ; j < listItems.length ; j++) {
-                    createPostContentRow(tag, listItems[j]);
-                }
-            } else {
-                createPostContentRow(tag, postContentData[row][tag]);
-            }
-        }
+    if(blogJson["nextBlog"]) {
+        nextBlogSlug.value = blogJson["nextBlog"].slug;
+        nextBlogTitle.value = blogJson["nextBlog"].title;
     }
 }

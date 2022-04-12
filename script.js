@@ -51,24 +51,24 @@ function generateJson() {
     alert("Blog post JSON copied");
 }
 
-function addContentRow() {
-    const row = createRow();
+function addContentRow(tag = "p", text = "") {
+    const row = createRow(tag, text);
 	blogContentContainer.appendChild(row);
 	row.scrollIntoView({ behavior: "smooth" });
 }
 
-function createRow() {
+function createRow(tag = "p", text = "") {
 	const row = document.createElement("div");
 	row.classList.add("blog-content-row");
 
 	// tags
 	const select = document.createElement("select");
-	const options = ["p", "h2", "h3", "ul", "codeblock"];
+	const options = ["p", "h2", "h3", "ul", "codeblock", "img"];
 	options.forEach(opt => {
 		const option = document.createElement("option");
 		option.value = opt;
 		option.textContent = opt;
-		option.selected = opt === "p";
+		option.selected = opt === tag;
 		select.append(option);
 	});
 
@@ -76,8 +76,31 @@ function createRow() {
 
 	// input
 	const input = document.createElement("textarea");
+    input.classList.add("row-value");
 	input.rows = 5;
+    input.value = text;
 	row.appendChild(input);
+
+    const imgDataDiv = document.createElement("div");
+    imgDataDiv.classList.add("img-data-container");
+
+    const imgPath = document.createElement("input");
+    imgPath.placeholder = "Image path";
+    imgDataDiv.appendChild(imgPath);
+
+    const imgAlt = document.createElement("input");
+    imgAlt.placeholder = "Image alt";
+    imgDataDiv.appendChild(imgAlt);
+
+    const imgWidth = document.createElement("input");
+    imgWidth.placeholder = "Image width";
+    imgDataDiv.appendChild(imgWidth);
+
+    const imgHeight = document.createElement("input");
+    imgHeight.placeholder = "Image height";
+    imgDataDiv.appendChild(imgHeight);
+
+    row.appendChild(imgDataDiv);
 
 	// delete btn
 	const deleteBtn = document.createElement("button");
@@ -117,6 +140,10 @@ function createRow() {
     });
     row.appendChild(downBtn);
 
+    select.addEventListener("change", function() {
+        row.classList.toggle("img-data", select.value === "img")
+    });
+
     return row;
 }
 
@@ -136,5 +163,19 @@ function readBlogJson() {
     if(blogJson["nextBlog"]) {
         nextBlogSlug.value = blogJson["nextBlog"].slug;
         nextBlogTitle.value = blogJson["nextBlog"].title;
+    }
+
+    const postContentData = blogJson["postContent"];
+    for(let row = 0 ; row < postContentData.length ; row++) {
+        for(let tag in postContentData[row]) {
+            if(tag === "ul") {
+                const listItems = postContentData[row][tag];
+                for(let j = 0 ; j < listItems.length ; j++) {
+                    addContentRow(tag, listItems[j]);
+                }
+            } else {
+                addContentRow(tag, postContentData[row][tag]);
+            }
+        }
     }
 }

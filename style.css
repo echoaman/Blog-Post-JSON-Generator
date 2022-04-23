@@ -58,7 +58,7 @@ body {
 	row-gap: 20px;
 }
 
-label {
+label, a {
 	color: white;
 }
 
@@ -116,16 +116,22 @@ textarea, input {
     background-color: tomato;
 }
 
-.img-data-container {
+.img-prop {
     display: none;
-    column-gap: 5px;
-    flex-grow: 1;
 }
 
 .blog-content-row.img-data .row-value {
     display: none;
 }
 
-.blog-content-row.img-data .img-data-container {
+.blog-content-row.img-data .img-prop {
     display: flex;
+}
+
+.file-name {
+    display: none;
+}
+
+.blog-content-row.code-data .file-name {
+    display: block;
 }

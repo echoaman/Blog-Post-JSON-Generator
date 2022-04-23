@@ -18,16 +18,8 @@ function generateJson() {
 
     // publish date
     const publishDate = {};
-    if(!date.value || !dateTime.value) {
-        const today = new Date();
-        const todayDateTime = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
-        const formattedDate = today.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
-        publishDate["date"] = formattedDate;
-        publishDate["datetime"] = todayDateTime;
-    } else {
-        publishDate["date"] = date.value;
-        publishDate["dateTime"] = dateTime.value;
-    }
+    publishDate["date"] = date.value;
+    publishDate["dateTime"] = dateTime.value;
     blogJson["publishedOn"] = publishDate;
 
     // Prev blog data
@@ -46,7 +38,73 @@ function generateJson() {
         blogJson["nextBlog"] = nextBlog;
     }
 
-    console.log(blogJson);
+    // blog post content
+    blogJson["postContent"] = [];
+
+    const postContentRows = document.querySelectorAll(".blog-content-row");
+    let rowData = null;
+    let listDataArray = null;
+    let listTag = null;
+
+    for (let index = 0; index < postContentRows.length; index++) {
+        const tag = postContentRows[index].children[0].value;
+        const tagValue = postContentRows[index].children[1].value;
+        if(tag !== "ul") {
+            if(listDataArray) {
+                // if ul data is present, push it
+                const listData = {};
+                listData[listTag] = listDataArray;
+                blogJson["postContent"].push(listData);
+
+                // reset
+                listDataArray = null;
+            }
+
+            rowData = {};
+
+            if(tag === "img") {
+                const imgData = {}
+                imgData["path"] = postContentRows[index].children[3].value;
+                imgData["alt"] = postContentRows[index].children[4].value;
+                imgData["width"] = postContentRows[index].children[5].value;
+                imgData["height"] = postContentRows[index].children[6].value;
+                rowData["img"] = imgData;
+                blogJson["postContent"].push(rowData);
+                continue;
+            }
+
+            if(tag === "codeblock") {
+                const codeData = {};
+                const code = tagValue.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                codeData["code"] = code;
+                codeData["file"] = postContentRows[index].children[2].value;
+                rowData["codeblock"] = codeData;
+                blogJson["postContent"].push(rowData);
+                continue;
+            }
+
+            rowData[tag] = tagValue;
+            blogJson["postContent"].push(rowData);
+        } else {
+            if(!listDataArray) {
+                // create new list data array
+                listDataArray = [tagValue];
+                listTag = tag;
+            } else {
+                listDataArray.push(tagValue);
+            }
+        }
+    }
+
+    if(listDataArray) {
+        // if ul data is present, push it
+        const listData = {};
+        listData[listTag] = listDataArray;
+        blogJson["postContent"].push(listData);
+
+        // reset
+        listDataArray = null;
+    }
     navigator.clipboard.writeText(JSON.stringify(blogJson));
     alert("Blog post JSON copied");
 }
@@ -65,12 +123,20 @@ function createRow(tag = "p", text = "") {
 	const select = document.createElement("select");
 	const options = ["p", "h2", "h3", "ul", "codeblock", "img"];
 	options.forEach(opt => {
-		const option = document.createElement("option");
+        const option = document.createElement("option");
 		option.value = opt;
 		option.textContent = opt;
 		option.selected = opt === tag;
 		select.append(option);
 	});
+
+    select.addEventListener("change", function() {
+        row.classList.toggle("img-data", select.value === "img");
+        row.classList.toggle("code-data", select.value === "codeblock");
+    });
+
+    row.classList.toggle("img-data", tag === "img");
+    row.classList.toggle("code-data", tag === "codeblock");
 
 	row.appendChild(select);
 
@@ -81,26 +147,32 @@ function createRow(tag = "p", text = "") {
     input.value = text;
 	row.appendChild(input);
 
-    const imgDataDiv = document.createElement("div");
-    imgDataDiv.classList.add("img-data-container");
+    // file name for code block
+    const fileName = document.createElement("input");
+    fileName.classList.add("file-name");
+    fileName.placeholder = "File name";
+    row.appendChild(fileName);
 
+    // Images
     const imgPath = document.createElement("input");
-    imgPath.placeholder = "Image path";
-    imgDataDiv.appendChild(imgPath);
-
+    imgPath.classList.add("img-prop");
+    imgPath.placeholder = "/image-path";
+    row.appendChild(imgPath);
+    
     const imgAlt = document.createElement("input");
+    imgAlt.classList.add("img-prop");
     imgAlt.placeholder = "Image alt";
-    imgDataDiv.appendChild(imgAlt);
-
+    row.appendChild(imgAlt);
+    
     const imgWidth = document.createElement("input");
+    imgWidth.classList.add("img-prop");
     imgWidth.placeholder = "Image width";
-    imgDataDiv.appendChild(imgWidth);
-
+    row.appendChild(imgWidth);
+    
     const imgHeight = document.createElement("input");
+    imgHeight.classList.add("img-prop");
     imgHeight.placeholder = "Image height";
-    imgDataDiv.appendChild(imgHeight);
-
-    row.appendChild(imgDataDiv);
+    row.appendChild(imgHeight);
 
 	// delete btn
 	const deleteBtn = document.createElement("button");
@@ -139,10 +211,6 @@ function createRow(tag = "p", text = "") {
         row.parentElement.insertBefore(row.nextElementSibling, row);
     });
     row.appendChild(downBtn);
-
-    select.addEventListener("change", function() {
-        row.classList.toggle("img-data", select.value === "img")
-    });
 
     return row;
 }
